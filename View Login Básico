@@ -1,0 +1,142 @@
+@model Inspinia_MVC5.ViewModel.UsuarioViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EmpresaName - Iniciar Sesión</title>
+
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet">
+    <link href="~/Fonts/font-awesome/css/font-awesome.css" rel="stylesheet">
+
+    <link href="~/Content/animate.css" rel="stylesheet">
+    <link href="~/Content/style.css" rel="stylesheet">
+
+    <!-- Section for main scripts render -->
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+</head>
+
+<body class="gray-bg">
+
+    <div class="loginColumns animated fadeInDown">
+        <div class="row">
+            <div class="col-md-3">
+            </div>
+            <div class="col-md-6">
+                <div class="ibox-content">
+                    @*<h2 class="font-bold">Bienvenido a EmpresaName</h2>*@
+
+                    @using (Html.BeginForm("Login", "Pages", FormMethod.Post, new { @class = "m-t" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true)
+
+                        <div class="form-group">
+                            @Html.EditorFor(model => model.Usuario, new { htmlAttributes = new { @class = "form-control", placeholder = "Usuario" } })
+                            @Html.ValidationMessageFor(model => model.Usuario, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group">
+                            @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control", placeholder = "Contraseña" } })
+                            @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+                        </div>
+
+                        @*<div class="form-group">
+                                @Html.EditorFor(model => model.Dominio, new { htmlAttributes = new { @class = "form-control", placeholder = "Dominio", @Value = "empresa" } })
+                                @Html.ValidationMessageFor(model => model.Dominio, "", new { @class = "text-danger" })
+                            </div>*@
+
+                        <input type="submit" value="Iniciar Sesión" class="btn btn-success block full-width m-b" />
+
+                        <a href="#">
+                            <small class="text-danger">@ViewBag.ErrorLoginMessage </small>
+                        </a>
+
+                        <div class="text-left">
+                            <a data-toggle="modal" class="text-success" href="#modal-form">Olvidaste tu contraseña?</a>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="col-md-3">
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row">
+            <div class="col-md-3">
+            </div>
+            <div class="col-md-3 text-left">
+                <small>Copyright EmpresaName</small>
+            </div>
+            <div class="col-md-3 text-right">
+                <small>© 2017-2018</small>
+            </div>
+            <div class="col-md-3">
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-form" class="modal fade" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12 b-r">
+                            <h3 class="m-t-none m-b">Generar contraseña</h3>
+
+                            <p>Se generará una contraseña aleatoria la misma que se enviará a su correo electrónico y que le permitirá ingresar la siguiente vez a su cuenta.</p>
+
+                            <div class="form-group">
+                                <label>Usuario</label>
+                                <input id="txtUsuario" type="text" placeholder="Ingrese su usuario" class="form-control">
+                                <a href="#">
+                                    <small class="text-danger">@ViewBag.ErrorRecuperarContrasena </small>
+                                </a>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-success pull-right m-t-n-xs" id="btnRestablecer"><strong>Enviar</strong></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $("#btnRestablecer").click(function () {
+
+            var Url = '@Url.Action("restablecerContrasenia", "Pages")';
+
+            var usuario = $("#txtUsuario").val();
+
+            $.ajax({
+                url: Url,
+                method: 'GET',
+                dataType: 'json',
+                async: true,
+                success: function (data) {
+                    alert("Respuesta recibida: " + data);
+                }
+            });
+
+        });
+
+    });
+
+</script>
