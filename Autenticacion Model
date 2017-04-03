@@ -1,0 +1,28 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.ComponentModel.DataAnnotations;
+
+namespace Inspinia_MVC5.ViewModel
+{
+    public class UsuarioViewModel
+    {
+        [Required(ErrorMessage = "El Usuario es obligatorio")]
+        [Display(Name = "Usuario", Prompt="Usuario")]
+        [StringLength(20)]
+        public String Usuario { get; set; }
+
+        [Required(ErrorMessage = "La Contraseña es obligatoria")]
+        [Display(Name = "Contraseña")]
+        [StringLength(20)]
+        [DataType(DataType.Password)]
+        //[RegularExpression("@^((?=.*[a-z])(?=.*[A-Z])(?=.*\d)).+$")]
+        public String Password { get; set; }
+
+        //[Required(ErrorMessage = "El Dominio es obligatorio")]
+        //[Display(Name = "Dominio")]
+        //[StringLength(20)]
+        //public String Dominio { get; set; }
+    }
+}
