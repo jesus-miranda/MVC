@@ -1,0 +1,168 @@
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using Inspinia_MVC5.Models;
+using System.Threading.Tasks;
+using Inspinia_MVC5.Classes;
+using Inspinia_MVC5.CustomAttributes;
+using Microsoft.Reporting.WebForms;
+using System.IO;
+using OfficeOpenXml;
+using Inspinia_MVC5.ModelsBI;
+using Inspinia_MVC5.BusinessIntelligence;
+using Inspinia_MVC5.DataSet.DataSetTableAdapters;
+using System.Web.Script.Serialization;
+using Inspinia_MVC5.Entities;
+
+namespace Inspinia_MVC5.Controllers
+{
+    [SessionExpireFilter]
+    public class VentasController : Controller
+    {
+        private Modelo db = new Modelo();
+
+        #region Producto
+
+        [CustomAuthorize("R000059")]
+        public async Task<ActionResult> Producto()
+        {
+            return View(await db.Producto.ToListAsync());
+        }
+
+        [CustomAuthorize("R000060")]
+        public async Task<ActionResult> DetailsProducto(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            Producto Producto = await db.Producto.FindAsync(id);
+
+            if (Producto == null)
+            {
+                return HttpNotFound();
+            }
+
+            return View(Producto);
+        }
+
+        [CustomAuthorize("C000020")]
+        public ActionResult CreateProducto()
+        {
+            ViewBag.Estado = new SelectList(db.Estado.Where(x => x.Segmentador == 1), "Id", "Nombre");
+            return View();
+        }
+
+        [CustomAuthorize("C000020")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> CreateProducto([Bind(Include = "Id,Codigo,Descripcion,Presentacion,Qty,PrecioUnitario,PrecioCaja,CostoUnitario,Iva,Estado")] Producto Producto)
+        {
+            if (ModelState.IsValid)
+            {
+                db.Producto.Add(Producto);
+                await db.SaveChangesAsync();
+
+                CorteInventario corteInicial = new CorteInventario();
+                corteInicial.IdProducto = Producto.Id;
+                corteInicial.IdBodega = 1;
+                corteInicial.Cantidad = 0;
+                corteInicial.Costo = 0;
+                corteInicial.Fecha = DateTime.Now;
+
+                db.CorteInventario.Add(corteInicial);
+                await db.SaveChangesAsync();
+
+                return RedirectToAction("Producto");
+            }
+
+            ViewBag.Estado = new SelectList(db.Estado.Where(x => x.Segmentador == 1), "Id", "Nombre", Producto.Estado);
+
+            return View(Producto);
+        }
+
+        [CustomAuthorize("U000020")]
+        public async Task<ActionResult> EditProducto(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            Producto Producto = await db.Producto.FindAsync(id);
+
+            if (Producto == null)
+            {
+                return HttpNotFound();
+            }
+
+            ViewBag.Estado = new SelectList(db.Estado.Where(x => x.Segmentador == 1), "Id", "Nombre", Producto.Estado);
+
+            return View(Producto);
+        }
+
+        [CustomAuthorize("U000020")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> EditProducto([Bind(Include = "Id,Codigo,Descripcion,Presentacion,Qty,PrecioUnitario,PrecioCaja,CostoUnitario,Iva,Estado")] Producto Producto)
+        {
+            if (ModelState.IsValid)
+            {
+                db.Entry(Producto).State = EntityState.Modified;
+                await db.SaveChangesAsync();
+                return RedirectToAction("Producto");
+            }
+
+            ViewBag.Estado = new SelectList(db.Estado.Where(x => x.Segmentador == 1), "Id", "Nombre", Producto.Estado);
+
+            return View(Producto);
+        }
+
+        [CustomAuthorize("D000020")]
+        public async Task<ActionResult> DeleteProducto(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            Producto Producto = await db.Producto.FindAsync(id);
+
+            if (Producto == null)
+            {
+                return HttpNotFound();
+            }
+
+            return View(Producto);
+        }
+
+        [CustomAuthorize("D000020")]
+        [HttpPost, ActionName("DeleteProducto")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> DeleteConfirmedProducto(int id)
+        {
+            Producto Producto = await db.Producto.FindAsync(id);
+            db.Producto.Remove(Producto);
+            await db.SaveChangesAsync();
+            return RedirectToAction("Producto");
+        }
+
+        #endregion
+        
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
+    }
+}
