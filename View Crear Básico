@@ -1,0 +1,127 @@
+@model Inspinia_MVC5.Models.Producto
+
+@{
+    ViewBag.Title = "Producto";
+}
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-sm-4">
+        <h2>Producto</h2>
+        <ol class="breadcrumb">
+            <li>
+                @Html.ActionLink("Lista", "Producto")
+            </li>
+            <li class="active">
+                <strong>Crear</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-sm-8">
+        <div class="title-action">
+            @Html.ActionLink("Regresar a la Lista", "Producto", null, new { @class = "btn btn-success" })
+        </div>
+    </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Crear Producto</h5>
+                </div>
+                <div class="ibox-content">
+
+                    @using (Html.BeginForm())
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-horizontal">
+                            @Html.ValidationSummary(true)
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Codigo, new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.EditorFor(model => model.Codigo)
+                                    @Html.ValidationMessageFor(model => model.Codigo)
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Descripcion, new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.EditorFor(model => model.Descripcion)
+                                    @Html.ValidationMessageFor(model => model.Descripcion)
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Presentacion, new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.EditorFor(model => model.Presentacion)
+                                    @Html.ValidationMessageFor(model => model.Presentacion)
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Qty, new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.EditorFor(model => model.Qty)
+                                    @Html.ValidationMessageFor(model => model.Qty)
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.PrecioUnitario, new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.EditorFor(model => model.PrecioUnitario)
+                                    @Html.ValidationMessageFor(model => model.PrecioUnitario)
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.PrecioCaja, new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.EditorFor(model => model.PrecioCaja)
+                                    @Html.ValidationMessageFor(model => model.PrecioCaja)
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.CostoUnitario, new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.EditorFor(model => model.CostoUnitario)
+                                    @Html.ValidationMessageFor(model => model.CostoUnitario)
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Iva, new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.CheckBoxFor(model => model.Iva)
+                                    @Html.ValidationMessageFor(model => model.Iva)
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Estado, "Estado", new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.DropDownList("Estado", (IEnumerable<SelectListItem>)ViewBag.Estado)
+                                    @Html.ValidationMessageFor(model => model.Estado)
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-md-offset-2 col-md-10">
+                                    <input type="submit" value="Crear" class="btn btn-success" />
+                                    @Html.ActionLink("Cancelar", "Producto", null, new { @class = "btn btn-white" })
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
