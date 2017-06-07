@@ -1,0 +1,699 @@
+﻿@*@model IEnumerable<Inspinia_MVC5.Models.OrdenDetalle>*@
+
+@{
+    ViewBag.Title = "Plantillas";
+}
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-sm-4">
+        <h2>Plantillas</h2>
+        <ol class="breadcrumb">
+            <li class="active">
+                <strong>Lista</strong>
+            </li>
+        </ol>
+    </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Plantilla Creación</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="form-group">
+                            @Html.Label("Vendedores", new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.DropDownList("IdVendedoresCrear", (IEnumerable<SelectListItem>)ViewBag.IdUsuariosCrear)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            @Html.Label("Bodegas", new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.DropDownList("IdBodegas", (IEnumerable<SelectListItem>)ViewBag.IdBodegas)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            @Html.Label("Formatos", new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.DropDownList("IdFormatos", (IEnumerable<SelectListItem>)ViewBag.IdFormatos)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        @using (Html.BeginForm("PlantillasCrear", "Ventas", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                        {
+                        <div class="col-xs-8">
+                            <input type="file" id="dataFile" name="upload" />
+                        </div>
+                        <div class="col-xs-4">
+                            <input type="submit" name="btnupload" value="Importar Ventas" class="btn btn-success" />
+                        </div>
+                        }
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-hover dataTables-PlantillaCrear" id="ajaxTablePedidosPorCrear">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Usuario
+                                    </th>
+                                    <th>
+                                        NombreCorto
+                                    </th>
+                                    <th>
+                                        Codigo
+                                    </th>
+                                    <th>
+                                        Descripcion
+                                    </th>
+                                    <th>
+                                        Bodega
+                                    </th>
+                                    <th>
+                                        Formato
+                                    </th>
+                                    <th>
+                                        Cantidad
+                                    </th>
+                                    <th>
+                                        Facturado
+                                    </th>
+                                    <th>
+                                        Adicional
+                                    </th>
+                                    <th>
+                                        Bare
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>
+                                        Usuario
+                                    </th>
+                                    <th>
+                                        NombreCorto
+                                    </th>
+                                    <th>
+                                        Codigo
+                                    </th>
+                                    <th>
+                                        Descripcion
+                                    </th>
+                                    <th>
+                                        Bodega
+                                    </th>
+                                    <th>
+                                        Formato
+                                    </th>
+                                    <th>
+                                        Cantidad
+                                    </th>
+                                    <th>
+                                        Facturado
+                                    </th>
+                                    <th>
+                                        Adicional
+                                    </th>
+                                    <th>
+                                        Bare
+                                    </th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Plantilla Confirmación</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="form-group">
+                            @Html.Label("Vendedores", new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.DropDownList("IdVendedoresConfirmar", (IEnumerable<SelectListItem>)ViewBag.IdUsuariosConfirmar)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        @using (Html.BeginForm("PlantillasConfirmar", "Ventas", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                        {
+                        <div class="col-xs-8">
+                            <input type="file" id="dataFile" name="upload" />
+                        </div>
+                        <div class="col-xs-4">
+                            <input type="submit" name="btnupload" value="Importar Ventas" class="btn btn-success" />
+                        </div>
+                        }
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-hover dataTables-PlantillaConfirmar" id="ajaxTablePedidosPorConfirmar">
+                            <thead>
+                                <tr>
+                                    <th>Pedido</th>
+                                    <th>Confirmacion</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>Pedido</th>
+                                    <th>Confirmacion</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Plantilla Liquidación</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="form-group">
+                            @Html.Label("Vendedores", new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.DropDownList("IdVendedoresLiquidar", (IEnumerable<SelectListItem>)ViewBag.IdUsuariosLiquidar)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            @Html.Label("Pedidos", new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.DropDownList("IdPedidoLiquidar", new List<SelectListItem> { new SelectListItem() { Text = "Todos", Value = "0" } })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        @using (Html.BeginForm("PlantillasLiquidar", "Ventas", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                        {
+                            <div class="col-xs-8">
+                                <input type="file" id="dataFile" name="upload" />
+                            </div>
+                            <div class="col-xs-4">
+                                <input type="submit" name="btnupload" value="Importar Ventas" class="btn btn-success" />
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-hover dataTables-PlantillaLiquidar" id="ajaxTablePedidosPorLiquidar">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Orden
+                                    </th>
+                                    <th>
+                                        Codigo
+                                    </th>
+                                    <th>
+                                        Producto
+                                    </th>
+                                    <th>
+                                        Bodega
+                                    </th>
+                                    <th>
+                                        Formato
+                                    </th>
+                                    <th>
+                                        Cantidad
+                                    </th>
+                                    <th>
+                                        Facturado
+                                    </th>
+                                    <th>
+                                        Adicional
+                                    </th>
+                                    <th>
+                                        Bare
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>
+                                        Orden
+                                    </th>
+                                    <th>
+                                        Codigo
+                                    </th>
+                                    <th>
+                                        Producto
+                                    </th>
+                                    <th>
+                                        Bodega
+                                    </th>
+                                    <th>
+                                        Formato
+                                    </th>
+                                    <th>
+                                        Cantidad
+                                    </th>
+                                    <th>
+                                        Facturado
+                                    </th>
+                                    <th>
+                                        Adicional
+                                    </th>
+                                    <th>
+                                        Bare
+                                    </th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    @Styles.Render("~/Content/plugins/dataTables/dataTablesStyles")
+    @Styles.Render("~/plugins/toastrStyles")
+
+    <style>
+        .my_class {
+            background-color: #7cafd4;
+        }
+    </style>
+}
+
+@section Scripts {
+    @Scripts.Render("~/plugins/dataTables")
+    @Scripts.Render("~/plugins/toastr")
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            dataTableCrear();
+            dataTableConfirmar();
+            getPedidosPorLiquidar();
+            dataTableLiquidar();
+
+            //MENSAJES LUEGO DE CARGAR PLANTILLAS
+            var hayMensaje = @ViewBag.HayMensaje;
+            var mensaje = '@ViewBag.Mensaje';
+
+            if (hayMensaje == 1)
+            {
+                var mensajes = mensaje.split('|');
+
+                if (mensajes[0] == "1")
+                {
+                    presentarMensajeToast('success', mensajes[1], 'Exito');
+                }
+                else
+                {
+                    presentarMensajeToast('error', mensajes[1], 'Error');
+                }
+            }
+
+            //PLANTILLA VENTAS CREAR
+            $("#IdVendedoresCrear").change(function () {
+                dataTableCrear();
+            });
+
+            $("#IdBodegas").change(function () {
+                dataTableCrear();
+            });
+
+            $("#IdFormatos").change(function () {
+                dataTableCrear();
+            });
+
+            //PLANTILLA VENTAS CONFIRMAR
+            $("#IdVendedoresConfirmar").change(function () {
+                dataTableConfirmar();
+            });
+
+            //PLANTILLA VENTAS LIQUIDAR
+            $("#IdVendedoresLiquidar").change(function () {
+                getPedidosPorLiquidar();
+                dataTableLiquidar();
+            });
+
+            $("#IdPedidoLiquidar").change(function () {
+                dataTableLiquidar();
+            });
+
+        });
+    </script>
+
+    <script>
+
+        function getPedidosPorLiquidar() {
+            var tableDataUrl = '@Url.Action("ddlPedidosPorLiquidarJsonData", "Ventas")';
+
+            var _idVendedor = $("#IdVendedoresLiquidar").val();
+
+            $.ajax({
+                url: tableDataUrl,
+                method: 'GET',
+                dataType: 'json',
+                data: {'_idVendedor': _idVendedor},
+                async: true,
+                success: function (data) {
+                    var ddl = $('#IdPedidoLiquidar');
+                    ddl.empty();
+                    $(data).each(function() {
+                        $(document.createElement('option'))
+                            .attr('value', this.Id)
+                            .text(this.Value)
+                            .appendTo(ddl);
+                    });
+                }
+            });
+        }
+
+        function presentarMensajeToast(_tipo, _msg, _titulo) {
+            var shortCutFunction = _tipo;
+            var msg = _msg;
+            var title = _titulo;
+            var $showDuration = 500;
+            var $hideDuration = 1100;
+            var $timeOut = 7100;
+            var $extendedTimeOut = 1100;
+            var $showEasing = 'swing';
+            var $hideEasing = 'linear';
+            var $showMethod = 'fadeIn';
+            var $hideMethod = 'fadeOut';
+
+            toastr.options = {
+                closeButton: true,
+                debug: false,
+                progressBar: true,
+                positionClass: 'toast-top-right',
+                onclick: function () {
+                    //alert('You can perform some custom action after a toast goes away');
+                },
+                showDuration: 400,
+                hideDuration: 1000,
+                timeOut: 7000,
+                extendedTimeOut: 1000,
+                showEasing: 'swing',
+                hideEasing: 'linear',
+                showMethod: 'fadeIn',
+                hideMethod: 'fadeOut'
+            };
+
+            var $toast = toastr[shortCutFunction](msg, title); // Wire up an event handler to a button in the toast, if it exists
+        }
+
+        function dataTableCrear(){
+
+            if ( $.fn.dataTable.isDataTable('.dataTables-PlantillaCrear') == true ) {
+                table = $('.dataTables-PlantillaCrear').DataTable();
+                table.destroy();
+            }
+
+            {
+
+                var _idVendedor = $("#IdVendedoresCrear").val();
+                var _idBodega = $("#IdBodegas").val();
+                var _idFormato = $("#IdFormatos").val();
+
+                $('.dataTables-PlantillaCrear').DataTable({
+                    ajax: {
+                        url: '@Url.Action("pedidosPorCrearJsonData", "Ventas")',
+                        type: 'GET',
+                        async: true,
+                        data: {'_idVendedor': _idVendedor, '_idBodega': _idBodega, '_idFormato': _idFormato}
+                    },
+                    columns: [
+                                { data: "Usuario" },
+                                { data: "NombreCorto" },
+                                { data: "Codigo" },
+                                { data: "Descripcion" },
+                                { data: "Bodega" },
+                                { data: "Formato" },
+                                { data: "Cantidad" },
+                                { data: "Facturado" },
+                                { data: "Adicional" },
+                                { data: "Bare" }
+                    ],
+                    columnDefs: [
+                            { className: "my_class", targets: [ 0, 2, 4, 5, 6, 8 ] }
+                    ],
+                    dom: '<"html5buttons"B>lTfgitp',
+                    buttons: [
+                        { extend: 'copy' },
+                        { extend: 'csv' },
+                        { extend: 'excel', title: 'Plantilla Crear Pedidos' },
+                        { extend: 'pdf', title: 'Plantilla Crear Pedidos' },
+
+                        {
+                            extend: 'print',
+                            customize: function (win) {
+                                $(win.document.body).addClass('white-bg');
+                                $(win.document.body).css('font-size', '10px');
+
+                                $(win.document.body).find('table')
+                                        .addClass('compact')
+                                        .css('font-size', 'inherit');
+                            }
+                        }
+                    ],
+                    language: {
+                        "sProcessing": "Procesando...",
+                        "sLengthMenu": "Mostrar _MENU_ registros",
+                        "sZeroRecords": "No se encontraron resultados",
+                        "sEmptyTable": "Ningún dato disponible en esta tabla",
+                        "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                        "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                        "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                        "sInfoPostFix": "",
+                        "sSearch": "Buscar:",
+                        "sUrl": "",
+                        "sInfoThousands": ",",
+                        "sLoadingRecords": "Cargando...",
+                        "oPaginate": {
+                            "sFirst": "Primero",
+                            "sLast": "Último",
+                            "sNext": "Siguiente",
+                            "sPrevious": "Anterior"
+                        },
+                        "oAria": {
+                            "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
+                            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                        }
+                    }
+                });
+
+            }
+        }
+
+        function dataTableConfirmar(){
+
+            if ( $.fn.dataTable.isDataTable('.dataTables-PlantillaConfirmar') == true ) {
+                table = $('.dataTables-PlantillaConfirmar').DataTable();
+                table.destroy();
+            }
+
+            {
+
+                var _idVendedor = $("#IdVendedoresConfirmar").val();
+
+                if(_idVendedor != null)
+                {
+                    $('.dataTables-PlantillaConfirmar').DataTable({
+                        ajax: {
+                            url: '@Url.Action("pedidosPorConfirmarJsonData", "Ventas")',
+                            type: 'GET',
+                            async: true,
+                            data: {'_idVendedor': _idVendedor}
+                        },
+                        columns: [
+                                    { data: "Pedido" },
+                                    { data: "Confirmacion" }
+                        ],
+                        columnDefs: [
+                            { className: "my_class", targets: [ 1 ] }
+                        ],
+                        dom: '<"html5buttons"B>lTfgitp',
+                        buttons: [
+                            { extend: 'copy' },
+                            { extend: 'csv' },
+                            { extend: 'excel', title: 'Plantilla Confirmar Pedidos' },
+                            { extend: 'pdf', title: 'Plantilla Confirmar Pedidos' },
+
+                            {
+                                extend: 'print',
+                                customize: function (win) {
+                                    $(win.document.body).addClass('white-bg');
+                                    $(win.document.body).css('font-size', '10px');
+
+                                    $(win.document.body).find('table')
+                                            .addClass('compact')
+                                            .css('font-size', 'inherit');
+                                }
+                            }
+                        ],
+                        language: {
+                            "sProcessing": "Procesando...",
+                            "sLengthMenu": "Mostrar _MENU_ registros",
+                            "sZeroRecords": "No se encontraron resultados",
+                            "sEmptyTable": "Ningún dato disponible en esta tabla",
+                            "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                            "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                            "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                            "sInfoPostFix": "",
+                            "sSearch": "Buscar:",
+                            "sUrl": "",
+                            "sInfoThousands": ",",
+                            "sLoadingRecords": "Cargando...",
+                            "oPaginate": {
+                                "sFirst": "Primero",
+                                "sLast": "Último",
+                                "sNext": "Siguiente",
+                                "sPrevious": "Anterior"
+                            },
+                            "oAria": {
+                                "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
+                                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                            }
+                        }
+                    });
+                }
+            }
+        }
+
+        function dataTableLiquidar(){
+
+            if ( $.fn.dataTable.isDataTable('.dataTables-PlantillaLiquidar') == true ) {
+                table = $('.dataTables-PlantillaLiquidar').DataTable();
+                table.destroy();
+            }
+
+            {
+
+                var _idVendedor = $("#IdVendedoresLiquidar").val();
+                var _idPedido = $("#IdPedidoLiquidar").val();
+
+                if(_idVendedor != null)
+                {
+                    $('.dataTables-PlantillaLiquidar').DataTable({
+                        ajax: {
+                            url: '@Url.Action("pedidosPorLiquidarJsonData", "Ventas")',
+                            type: 'GET',
+                            async: true,
+                            data: {'_idVendedor': _idVendedor, '_idPedido': _idPedido}
+                        },
+                        columns: [
+                                    { data: "Orden" },
+                                    { data: "Codigo" },
+                                    { data: "Producto" },
+                                    { data: "Bodega" },
+                                    { data: "Formato" },
+                                    { data: "Cantidad" },
+                                    { data: "Facturado" },
+                                    { data: "Adicional" },
+                                    { data: "Bare" }
+                        ],
+                        columnDefs: [
+                            { className: "my_class", targets: [ 8 ] }
+                        ],
+                        dom: '<"html5buttons"B>lTfgitp',
+                        buttons: [
+                            { extend: 'copy' },
+                            { extend: 'csv' },
+                            { extend: 'excel', title: 'Plantilla Liquidar Pedidos' },
+                            { extend: 'pdf', title: 'Plantilla Liquidar Pedidos' },
+
+                            {
+                                extend: 'print',
+                                customize: function (win) {
+                                    $(win.document.body).addClass('white-bg');
+                                    $(win.document.body).css('font-size', '10px');
+
+                                    $(win.document.body).find('table')
+                                            .addClass('compact')
+                                            .css('font-size', 'inherit');
+                                }
+                            }
+                        ],
+                        language: {
+                            "sProcessing": "Procesando...",
+                            "sLengthMenu": "Mostrar _MENU_ registros",
+                            "sZeroRecords": "No se encontraron resultados",
+                            "sEmptyTable": "Ningún dato disponible en esta tabla",
+                            "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                            "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                            "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                            "sInfoPostFix": "",
+                            "sSearch": "Buscar:",
+                            "sUrl": "",
+                            "sInfoThousands": ",",
+                            "sLoadingRecords": "Cargando...",
+                            "oPaginate": {
+                                "sFirst": "Primero",
+                                "sLast": "Último",
+                                "sNext": "Siguiente",
+                                "sPrevious": "Anterior"
+                            },
+                            "oAria": {
+                                "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
+                                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                            }
+                        }
+                    });
+                }
+
+            }
+        }
+
+    </script>
+}

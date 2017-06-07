@@ -1,0 +1,775 @@
+﻿@model Inspinia_MVC5.Models.Orden
+
+@{
+    ViewBag.Title = "Pedidos";
+}
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-sm-4">
+        <h2>Pedidos</h2>
+        <ol class="breadcrumb">
+            <li>
+                @Html.ActionLink("Lista", "Pedidos")
+            </li>
+            <li class="active">
+                <strong>Pedido</strong>
+            </li>
+        </ol>
+    </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Orden</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-xs-6"><small>Secuencial: <strong>@Model.Orden1</strong></small></div>
+                        <div class="col-xs-6"><small>Fecha: <strong>@Model.Fecha</strong></small></div>
+
+                        @if (!ViewBag.EsAdministrador)
+                        {
+                            <div class="col-xs-6"><small>Vendedor: <strong>@Model.Usuario.Usuario1</strong></small></div>
+                        }
+                        else
+                        {
+                            <div class="col-xs-6"><small>Vendedor: <strong>@Html.DropDownList("Vendedor", (IEnumerable<SelectListItem>)ViewBag.Vendedor)</strong></small></div>
+                        }
+
+                        <div class="col-xs-6"><small>Estado: <strong>@Model.Estado1.DescripcionInterna</strong></small></div>
+
+                        <div class="col-xs-12">
+                            <br />
+                            @switch (Model.Estado)
+                            {
+                                case 15:
+                                    //CREADO
+                                    @Html.ActionLink("Confirmar", "ConfirmarPedido", new { id = Model.Id }, new { @class = "btn btn-success btn-md" })
+                                    break;
+                                case 17:
+                                    //CONFIRMADO
+                                    <div class="form-group" id="data_1">
+                                        <label class="font-noraml">Fecha Orden Bare</label>
+                                        <div class="input-group date">
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span><input type="text" class="form-control">
+                                        </div>
+                                    </div>
+                                    <button id="btnLiquidar" class="btn btn-success btn-md">Liquidar</button>
+                                    @*@Html.ActionLink("Liquidar", "LiquidarPedido", new { id = Model.Id }, new { @class = "btn btn-success btn-md" })*@
+                                    break;
+                                case 18:
+                                    //LIQUIDADO
+                                    @Html.ActionLink("Descargar Pdf", "DescargarFacturaPedido", new { id = Model.Id }, new { @class = "btn btn-success btn-sm" })
+                                    if (ViewBag.EsAdministrador)
+                                    {
+                                        @Html.ActionLink("Corregir Facturación", "CorregirPedido", new { id = Model.Id }, new { @class = "btn btn-success btn-sm" })
+                                    }
+                                    break;
+                                default:
+                                    break;
+                            }
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="col-xs-6"><small>Total Amount: <strong><label id="TotalPedido"></label></strong></small></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Productos</h5>
+                    <div class="ibox-tools">
+                        @if (Model.Estado == 15)
+                        {
+                            @Html.ActionLink("Ingresar Producto", "CreatePedidoDetalle", new { id = Model.Id }, new { @class = "btn btn-success btn-md" })
+                            <button class="ladda-button btn btn-primary" data-style="zoom-in" id="btnGuardar15">Guardar Cambios</button>
+                        }
+                        @if (Model.Estado == 17)
+                        {
+                            <button class="ladda-button btn btn-primary" data-style="zoom-in" id="btnGuardar17">Guardar Cambios</button>
+                        }
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table id="editable"></table>
+                        <div id="pager"></div>
+                    </div>
+                    <div class="add_delete_toolbar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    @Styles.Render("~/plugins/laddaStyles")
+    @Styles.Render("~/Content/plugins/jqGrid/jqGridStyles")
+    @Styles.Render("~/Content/plugins/dataTables/dataTablesStyles")
+    @Styles.Render("~/plugins/toastrStyles")
+    @Styles.Render("~/plugins/dataPickerStyles")
+}
+
+@section Scripts {
+    @Scripts.Render("~/plugins/ladda")
+    @Scripts.Render("~/plugins/jqGrid")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/bundles/dataTablesEditable")
+    @Scripts.Render("~/plugins/dataTables")
+    @Scripts.Render("~/plugins/jeditable")
+    @Scripts.Render("~/plugins/validate")
+
+    @Scripts.Render("~/plugins/toastr")
+    @Scripts.Render("~/plugins/dataPicker")
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $('#btnGuardar15').click(function(){
+                var l = Ladda.create(this);
+                l.start();
+
+                var urlSalvarDatos = '@Url.Action("GuardarDatosMasivos15", "Ventas")';
+
+                var model = {
+                    Id: "",
+                    Cantidad: "",
+                    Adicional: "",
+                    Bare: ""
+                }
+
+                var modelos = new Array(model);
+
+                var ids = jQuery('#editable').jqGrid('getDataIDs');
+
+                //$(ids).each(function (index, element) {
+                //    $("#editable").jqGrid('saveRow', index);
+
+                //    console.log('saveRow en: ' + element);
+                //});
+
+                for (var i = 0; i < ids.length; i++) {
+
+                    var rowId = ids[i];
+
+                    var rowData = jQuery('#editable').jqGrid('getRowData', rowId);
+
+                    model = {
+                        Id: rowData.Id,
+                        Cantidad: rowData.Cantidad,
+                        Adicional: rowData.Adicional,
+                        Bare: '0'
+                    };
+
+                    modelos.push(model);
+                }
+
+                var datos = JSON.stringify(modelos);
+
+                //alert(datos);
+
+                $.ajax({
+
+                    url: urlSalvarDatos,
+                    type: 'POST',
+                    //dataType: 'json',
+                    //async: true,
+                    //data: { 'datos': datos },
+                    data: { forms: datos},
+                    //contentType: 'application/json; charset=utf-8',
+                    success: function (data) {
+
+                        var respuestas = data.split("|");
+
+                        if(respuestas[0] == "1")
+                        {
+                            presentarMensajeToast('success', respuestas[1], 'Exito');
+                        }
+                        else
+                        {
+                            presentarMensajeToast('error', respuestas[1], 'Error');
+                        }
+
+                        $('#editable').jqGrid('setGridParam', { datatype: 'json' }).trigger('reloadGrid');
+
+                    },
+                    error: function (data) {
+                        presentarMensajeToast('error', 'Algo ocurrio mal, intentalo nuevamente', 'Error');
+
+                        $('#editable').jqGrid('setGridParam', { datatype: 'json' }).trigger('reloadGrid');
+                    }
+
+                }).always(function() {
+                    l.stop();
+                    ActualizarTotal();
+                });
+
+            });
+
+            $('#btnGuardar17').click(function(){
+                var l = Ladda.create(this);
+                l.start();
+
+                var urlSalvarDatos = '@Url.Action("GuardarDatosMasivos17", "Ventas")';
+
+                var model = {
+                    Id: "",
+                    Cantidad: "",
+                    Adicional: "",
+                    Bare: ""
+                }
+
+                var modelos = new Array(model);
+
+                var ids = jQuery('#editable').jqGrid('getDataIDs');
+
+                for (var i = 0; i < ids.length; i++) {
+
+                    var rowId = ids[i];
+
+                    var rowData = jQuery('#editable').jqGrid('getRowData', rowId);
+
+                    model = {
+                        Id: rowData.Id,
+                        Cantidad: '0',
+                        Adicional: '0',
+                        Bare: rowData.Bare
+                    };
+
+                    modelos.push(model);
+                }
+
+                var datos = JSON.stringify(modelos);
+
+                $.ajax({
+
+                    url: urlSalvarDatos,
+                    type: 'POST',
+                    //dataType: 'json',
+                    //async: true,
+                    //data: { 'datos': datos },
+                    data: { forms: datos},
+                    //contentType: 'application/json; charset=utf-8',
+                    success: function (data) {
+
+                        var respuestas = data.split("|");
+
+                        if(respuestas[0] == "1")
+                        {
+                            presentarMensajeToast('success', respuestas[1], 'Exito');
+                        }
+                        else
+                        {
+                            presentarMensajeToast('error', respuestas[1], 'Error');
+                        }
+
+                        $('#editable').jqGrid('setGridParam', { datatype: 'json' }).trigger('reloadGrid');
+
+                    },
+                    error: function (data) {
+                        presentarMensajeToast('error', 'Algo ocurrio mal, intentalo nuevamente', 'Error');
+
+                        $('#editable').jqGrid('setGridParam', { datatype: 'json' }).trigger('reloadGrid');
+                    }
+
+                }).always(function() { l.stop(); ActualizarTotal(); });
+
+            });
+
+            ActualizarTotal();
+
+            Date.prototype.addDays = function(days) {
+                var dat = new Date(this.valueOf());
+                dat.setDate(dat.getDate() + days);
+                return dat;
+            }
+
+            $("#Vendedor option[value='@Model.Vendedor']").attr("selected", "selected");
+
+            var nextDay = new Date();
+            nextDay = nextDay.addDays(1);
+
+            $.fn.datepicker.dates['es'] = {
+                days: ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"],
+                daysShort: ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sáb"],
+                daysMin: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
+                months: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+                monthsShort: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
+                today: "Hoy",
+                clear: "Limpiar",
+                format: "dd/mm/yyyy",
+                titleFormat: "MM yyyy", /* Leverages same syntax as 'format' */
+                weekStart: 0
+            };
+
+            $('#data_1 .input-group.date').datepicker({
+                format: 'dd/mm/yyyy',
+                //startDate: '-3d',
+                autoclose: true,
+                language: 'es',
+                startDate: new Date(),
+                todayBtn: 'linked',
+                todayHighlight: true,
+                date: nextDay
+            });
+
+            $('#data_1 .input-group.date').datepicker('setDate', nextDay);
+
+            //Configuración jqGrid
+            $.jgrid.defaults.recordtext = "Registro {0} - {1} de {2}";
+            $.jgrid.defaults.emptyrecords =  "Sin registros que mostrar";
+            $.jgrid.defaults.loadtext = "Cargando...";
+            $.jgrid.defaults.pgtext = "Página {0} de {1}";
+
+            var lastSel;
+
+            if(@Model.Estado == 15)
+            {
+                jQuery("#editable").jqGrid({
+
+                    url: '/Ventas/GetGridData',
+                    postData: {
+                        idPedido: @Model.Id,
+                    },
+                    //editurl: '/Ventas/GridEdit',
+                    datatype: 'json',
+                    mtype: 'GET',
+                    loadonce: true,
+                    colNames: ['Id','Producto', 'Formato', 'Cantidad', 'Adicional', 'Promedio Venta'],
+                    colModel: [
+                        { key: true, hidden: true, name: "Id", index: "Id", width: '0', align: 'center' },
+                        { key: false, name: "Descripcion", index: "Descripcion", editable: false, width: '400', align: 'left'},
+                        { key: false, name: "Nombre", index: "Nombre", editable: false, width: '150', align: 'center'},
+                        { key: false, name: "Cantidad", index: "Cantidad", editable: true, width: '150', align: 'center', editrules: { integer: true, required: true}
+                            ,editoptions: {
+                                type: "number",
+                                step: "1",
+                                min: "0",
+                                max: "1000",
+                                pattern: "[0-9]",
+                                title: "Esto debe ser un número entero sin decimales"
+                            }
+                        },
+                        { key: false, name: "Adicional", index: "Adicional", editable: true, width: '150', align: 'center', editrules: { integer: true, required: true}
+                            ,editoptions: {
+                                type: "number",
+                                step: "1",
+                                min: "0",
+                                max: "1000",
+                                pattern: "[0-9]",
+                                title: "Esto debe ser un número entero sin decimales"
+                            }
+                        },
+                        { key: false, name: "PromedioVenta", index: "PromedioVenta", editable: false, width: '150', align: 'center'
+                            ,editoptions: {
+                                type: "number",
+                                step: "1",
+                                min: "0",
+                                max: "1000",
+                                pattern: "[0-9]",
+                                title: "Esto debe ser un número entero sin decimales"
+                            }
+                        }
+                    ],
+                    //pager: jQuery('#pager'),
+                    rowNum: 100,
+                    rowList: [100, 200, 300, 400],
+                    viewrecords: true,
+                    //caption: 'Productos',
+                    emptyrecords: 'No hay información disponible',
+                    jsonReader:{
+                        root: "rows",
+                        page: "page",
+                        total: "total",
+                        records: "records",
+                        repeatitems: false,
+                        id: "0"
+                        //,records: function (obj) {
+                        //    // return not so large value of records
+                        //    return Math.min(66692, obj.records);
+                        //}
+                    },
+                    //loadComplete: function (data) {
+                    //    var $self = $(this), p = $self.jqGrid("getGridParam"),
+                    //        numberFormat = $.fmatter.util.NumberFormat || $.fmatter.NumberFormat,
+                    //        fmt = $.jgrid.formatter.integer || {},
+                    //        from = numberFormat(parseInt(p.page,10), fmt),
+                    //        to = numberFormat((parseInt(p.page,10)-1)*parseInt(p.rowNum,10) + p.reccount, fmt),
+                    //        total = numberFormat(parseInt(data.records,10), fmt); // use correct value
+
+                    //    // fix the displayed row numbers
+                    //    $(".ui-paging-info", p.pager)
+                    //        .html($.jgrid.format(p.recordtext, from, to, total));
+                    //},
+                    autowidth: true,
+                    scrollerbar:true,
+                    height: '200',
+                    multiselect: false,
+                    sortname: 'Id',
+                    sortorder: "asc",
+
+                    cellEdit: true,
+                    cellsubmit: 'clientArray',
+                    editurl: 'clientArray',
+
+                    beforeSaveCell: function (rowid, cellname, value, iRow, iCol) {
+
+                    },
+
+                    afterSaveCell: function (rowid, cellname, value, iRow, iCol) {
+
+                    },
+
+                    afterEditCell: function(rowid, cellname, value, iRow, iCol) {
+
+                        // Get a handle to the actual input field
+                        var inputControl = jQuery('#' + (iRow) + '_' + cellname);
+
+                        
+                        // Listen for focus lost
+                        inputControl.bind("focusout", function(e) {
+
+                            jQuery("#editable").jqGrid("editCell", iRow, iCol, false);
+                            
+                        }); // End focusout binding
+
+                        // Listen for enter (and shift-enter)
+                        inputControl.bind("keydown",function(e) {
+
+                            if (e.keyCode === 13 || e.keyCode === 9) {  // Enter key:
+                                var increment = e.shiftKey ? -1 : 1;
+
+                                // Do not go out of bounds
+                                var lastRowInd = jQuery("#editable").jqGrid("getGridParam","reccount")
+                                if ( iRow+increment == 0 || iRow+increment == lastRowInd+1)
+                                    return;   // we could re-edit current cell or wrap
+                                else
+                                    jQuery("#editable").jqGrid("editCell",iRow+increment,iCol,true);
+                            }
+                        }); // End keydown binding
+                    }
+
+                });
+            }
+            else if (@Model.Estado == 17)
+            {
+                jQuery("#editable").jqGrid({
+
+                    url: '/Ventas/GetGridData',
+                    postData: {
+                        idPedido: @Model.Id,
+                    },
+                    //editurl: '/Ventas/GridEdit',
+                    datatype: 'json',
+                    mtype: 'GET',
+                    loadonce: true,
+                    colNames: ['Id','Producto', 'Formato', 'Pedido', 'Bare'],
+                    colModel: [
+                        { key: true, hidden: true, name: "Id", index: "Id", width: '0%', align: 'center' },
+                        { key: false, name: "Descripcion", index: "Descripcion", editable: false, width: '50%', align: 'left' },
+                        { key: false, name: "Nombre", index: "Nombre", editable: false, width: '25%', align: 'center' },
+                        { key: false, name: "CA", index: "CA", editable: false, width: '25%', align: 'center' },
+                        { key: false, name: "Bare", index: "Bare", editable: true, width: '25%', align: 'center', editrules: { integer: true, required: true}
+                            ,editoptions: {
+                                type: "number",
+                                step: "1",
+                                min: "0",
+                                max: "1000",
+                                pattern: "[0-9]",
+                                title: "Esto debe ser un número entero sin decimales"
+                            }
+                        },
+                    ],
+                    pager: jQuery('#pager'),
+                    rowNum: 100,
+                    rowList: [100, 200, 300, 400],
+                    viewrecords: true,
+                    //caption: 'Productos',
+                    emptyrecords: 'No hay información disponible',
+                    jsonReader:{
+                        root: "rows",
+                        page: "page",
+                        total: "total",
+                        records: "records",
+                        repeatitems: false,
+                        id: "0"
+                    },
+                    autowidth: true,
+                    scrollerbar:true,
+                    height: '200',
+                    multiselect: false,
+                    sortname: 'Id',
+                    sortorder: "asc",
+
+                    cellEdit: true,
+                    cellsubmit: 'clientArray',
+                    editurl: 'clientArray',
+
+                    beforeSaveCell: function (rowid, cellname, value, iRow, iCol) {
+
+                    },
+
+                    afterSaveCell: function (rowid, cellname, value, iRow, iCol) {
+
+                    },
+
+                    afterEditCell: function(rowid, cellname, value, iRow, iCol) {
+
+                        // Get a handle to the actual input field
+                        var inputControl = jQuery('#' + (iRow) + '_' + cellname);
+
+                        // Listen for focus lost
+                        inputControl.bind("focusout", function(e) {
+
+                            jQuery("#editable").jqGrid("editCell", iRow, iCol, false);
+                            
+                        }); // End focusout binding
+
+                        // Listen for enter (and shift-enter)
+                        inputControl.bind("keydown",function(e) {
+
+                            if (e.keyCode === 13 || e.keyCode === 9) {  // Enter key:
+                                var increment = e.shiftKey ? -1 : 1;
+
+                                // Do not go out of bounds
+                                var lastRowInd = jQuery("#editable").jqGrid("getGridParam","reccount")
+                                if ( iRow+increment == 0 || iRow+increment == lastRowInd+1)
+                                    return;   // we could re-edit current cell or wrap
+                                else
+                                    jQuery("#editable").jqGrid("editCell",iRow+increment,iCol,true);
+                            }
+                        }); // End keydown binding
+                    }
+                });
+            }
+            else if (@Model.Estado == 18)
+            {
+                jQuery("#editable").jqGrid({
+
+                    url: '/Ventas/GetGridData',
+                    postData: {
+                        idPedido: @Model.Id,
+                    },
+                    //editurl: '/Ventas/GridEdit',
+                    datatype: 'json',
+                    mtype: 'GET',
+                    loadonce: true,
+                    colNames: ['Id','Producto', 'Formato', 'Pedido', 'Bare', 'Facturado', 'Amount'],
+                    colModel: [
+                        { key: true, hidden: true, name: "Id", index: "Id", width: '0%', align: 'center' },
+                        { key: false, name: "Descripcion", index: "Descripcion", editable: false, width: '45%', align: 'left' },
+                        { key: false, name: "Nombre", index: "Nombre", editable: false, width: '10%', align: 'center' },
+                        { key: false, name: "CA", index: "CA", editable: false, width: '10%', align: 'center' },
+                        { key: false, name: "Bare", index: "Bare", editable: false, width: '10%', align: 'center' },
+                        { key: false, name: "Facturado", index: "Facturado", editable: false, width: '10%', align: 'center' },
+                        { key: false, name: "Total", index: "Total", editable: false, width: '10%', align: 'center' }
+                    ],
+                    pager: jQuery('#pager'),
+                    rowNum: 100,
+                    rowList: [100, 200, 300, 400],
+                    viewrecords: true,
+                    //caption: 'Productos',
+                    emptyrecords: 'No hay información disponible',
+                    jsonReader:{
+                        root: "rows",
+                        page: "page",
+                        total: "total",
+                        records: "records",
+                        repeatitems: false,
+                        id: "0"
+                    },
+                    autowidth: true,
+                    scrollerbar:true,
+                    height: '200',
+                    multiselect: false,
+                    sortname: 'Id',
+                    sortorder: "asc",
+
+                    cellEdit: true,
+                    cellsubmit: 'clientArray',
+                    editurl: 'clientArray',
+
+                    beforeSaveCell: function (rowid, cellname, value, iRow, iCol) {
+
+                    },
+
+                    afterSaveCell: function (rowid, cellname, value, iRow, iCol) {
+
+                    },
+
+                    afterEditCell: function(rowid, cellname, value, iRow, iCol) {
+
+                        // Get a handle to the actual input field
+                        var inputControl = jQuery('#' + (iRow) + '_' + cellname);
+
+                        // Listen for focus lost
+                        inputControl.bind("focusout", function(e) {
+
+                            jQuery("#editable").jqGrid("editCell", iRow, iCol, false);
+                            
+                        }); // End focusout binding
+
+                        // Listen for enter (and shift-enter)
+                        inputControl.bind("keydown",function(e) {
+
+                            if (e.keyCode === 13 || e.keyCode === 9) {  // Enter key:
+                                var increment = e.shiftKey ? -1 : 1;
+
+                                // Do not go out of bounds
+                                var lastRowInd = jQuery("#editable").jqGrid("getGridParam","reccount")
+                                if ( iRow+increment == 0 || iRow+increment == lastRowInd+1)
+                                    return;   // we could re-edit current cell or wrap
+                                else
+                                    jQuery("#editable").jqGrid("editCell",iRow+increment,iCol,true);
+                            }
+                        }); // End keydown binding
+                    }
+                });
+            }
+
+        });//$(document).ready(function ()
+
+        //Mensajes
+        function presentarMensajeToast(_tipo, _msg, _titulo) {
+            var shortCutFunction = _tipo;
+            var msg = _msg;
+            var title = _titulo;
+            var $showDuration = 500;
+            var $hideDuration = 1100;
+            var $timeOut = 7100;
+            var $extendedTimeOut = 1100;
+            var $showEasing = 'swing';
+            var $hideEasing = 'linear';
+            var $showMethod = 'fadeIn';
+            var $hideMethod = 'fadeOut';
+
+            toastr.options = {
+                closeButton: true,
+                debug: false,
+                progressBar: true,
+                positionClass: 'toast-top-right',
+                onclick: function () {
+                    //alert('You can perform some custom action after a toast goes away');
+                },
+                showDuration: 400,
+                hideDuration: 1000,
+                timeOut: 7000,
+                extendedTimeOut: 1000,
+                showEasing: 'swing',
+                hideEasing: 'linear',
+                showMethod: 'fadeIn',
+                hideMethod: 'fadeOut'
+            };
+
+            var $toast = toastr[shortCutFunction](msg, title); // Wire up an event handler to a button in the toast, if it exists
+        }
+
+        $("#Vendedor").change(function () {
+            //var end = this.value;
+            //var firstDropVal = $('#pick').val();
+
+            //ASIGNAR A VENDEDOR
+            var ventasAsignarVendedorUrl = '@Url.Action("AsignarVendedor", "Ventas")';
+
+            var idOrden = @Model.Id;
+            var idVendedor = this.value;
+
+            //alert('Enviando idOrden: ' + idOrden + " idVendedor: " + idVendedor);
+
+            $.ajax({
+                url: ventasAsignarVendedorUrl,
+                method: 'GET',
+                dataType: 'json',
+                async: true,
+                data: { 'idOrden': idOrden, 'idVendedor': idVendedor },
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+
+                    var respuestas = data.split("|");
+
+                    if(respuestas[0] == "1")
+                    {
+                        presentarMensajeToast('success', 'Vendedor asignado al pedido exitosamente', 'Exito');
+                    }
+                    else
+                    {
+                        presentarMensajeToast('error', respuestas[1], 'Error');
+                    }
+
+                },
+                error: function (data) {
+                    presentarMensajeToast('error', 'Algo ocurrio mal, intentalo nuevamente', 'Error');
+                }
+            });
+
+        });
+
+        $("#btnLiquidar").click(function () {
+            //ASIGNAR A VENDEDOR
+            var liquidarUrl = '@Url.Action("LiquidarPedido", "Ventas")';
+            var idOrden = @Model.Id;
+            var fechaLiquidar = $('#data_1 .input-group.date').datepicker('getDate').toLocaleDateString("es-EC");
+
+            $.ajax({
+                url: liquidarUrl,
+                method: 'GET',
+                dataType: 'json',
+                async: true,
+                data: { 'id': idOrden, 'fecha': fechaLiquidar },
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+
+                    var respuestas = data.split("|");
+
+                    if(respuestas[0] == "1")
+                    {
+                        presentarMensajeToast('success', 'Liquidación realizada con éxito', 'Éxito');
+
+                        window.location.href="@Url.Action("Pedido", "Ventas", new { id = Model.Id })";
+                    }
+                    else
+                    {
+                        presentarMensajeToast('error', respuestas[1], 'Error');
+                    }
+
+                },
+                error: function (data) {
+                    presentarMensajeToast('error', 'Algo ocurrio mal, intentalo nuevamente', 'Error');
+                }
+            });
+        });
+
+        function ActualizarTotal(){
+            var actualizarTotalUrl = '@Url.Action("GetTotalOrden", "Ventas")';
+            var idOrden = @Model.Id;
+
+            $.ajax({
+                url: actualizarTotalUrl,
+                method: 'GET',
+                dataType: 'json',
+                async: true,
+                data: { 'id': idOrden },
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+
+                    $('#TotalPedido').text(data.toFixed(2));
+
+                },
+                error: function (data) {
+                    presentarMensajeToast('error', 'Algo ocurrio mal al obtener total, intentalo nuevamente', 'Error');
+                }
+            });
+        }
+
+    </script>
+}

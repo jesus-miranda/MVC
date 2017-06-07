@@ -1,0 +1,157 @@
+﻿@model IEnumerable<Inspinia_MVC5.Models.Orden>
+
+@{
+    ViewBag.Title = "Facturados";
+}
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-sm-4">
+        <h2>Facturados</h2>
+        <ol class="breadcrumb">
+            <li class="active">
+                <strong>Lista</strong>
+            </li>
+        </ol>
+    </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Lista de Facturados</h5>
+                    <div class="ibox-tools">
+                        @if (ViewBag.TienePedidoCreado == false)
+                        {
+                            @Html.ActionLink("Crear Nuevo", "CreatePedido", null, new { @class = "btn btn-success btn-md" })
+                        }
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-hover dataTables-Pedidos">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Orden1)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Fecha)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Usuario.NombreCorto)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Estado1.Nombre)
+                                    </th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Orden1)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Fecha)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Usuario.NombreCorto)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Estado1.Nombre)
+                                        </td>
+                                        <td>
+                                            @Html.ActionLink("Productos", "Pedido", new { id = item.Id }, new { @class = "btn btn-success btn-sm" })
+                                            @Html.ActionLink("Descargar Pdf", "DescargarFacturaPedido", new { id = item.Id }, new { @class = "btn btn-success btn-sm" })
+                                            @Html.ActionLink("Corregir Facturación", "CorregirPedido", new { id = item.Id }, new { @class = "btn btn-success btn-sm" })
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Orden1)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Fecha)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Usuario.NombreCorto)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Estado1.Nombre)
+                                    </th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    @Styles.Render("~/Content/plugins/dataTables/dataTablesStyles")
+}
+
+@section Scripts {
+    @Scripts.Render("~/plugins/dataTables")
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.dataTables-Pedidos').DataTable({
+
+                dom: '<"html5buttons"B>lTfgitp',
+                buttons: [
+                    { extend: 'copy' },
+                    { extend: 'csv' },
+                    { extend: 'excel', title: 'Pedidos' },
+                    { extend: 'pdf', title: 'Pedidos' },
+
+                    {
+                        extend: 'print',
+                        customize: function (win) {
+                            $(win.document.body).addClass('white-bg');
+                            $(win.document.body).css('font-size', '10px');
+
+                            $(win.document.body).find('table')
+                                    .addClass('compact')
+                                    .css('font-size', 'inherit');
+                        }
+                    }
+                ],
+                language: {
+                    "sProcessing": "Procesando...",
+                    "sLengthMenu": "Mostrar _MENU_ registros",
+                    "sZeroRecords": "No se encontraron resultados",
+                    "sEmptyTable": "Ningún dato disponible en esta tabla",
+                    "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sSearch": "Buscar:",
+                    "sUrl": "",
+                    "sInfoThousands": ",",
+                    "sLoadingRecords": "Cargando...",
+                    "oPaginate": {
+                        "sFirst": "Primero",
+                        "sLast": "Último",
+                        "sNext": "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
+                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                    }
+                }
+            });
+        });
+    </script>
+}
